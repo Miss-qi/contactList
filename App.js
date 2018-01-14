@@ -1,32 +1,24 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
+import { Provider } from 'react-redux';
+import { applyMiddleware, createStore } from 'redux';
 import {
-    Platform,
     StyleSheet,
-    Text,
     View
 } from 'react-native';
-import PhoneContactList from './app/component/PhoneContactList';
+import reducer from './app/reducers';
 import AppRouter from "./app/route/router";
+import logger from './app/middleware/logger';
 
-const instructions = Platform.select({
-    ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-    android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+const store = createStore(reducer, applyMiddleware(logger));
 
 export default class App extends Component<{}> {
     render() {
         return (
-            <View style={styles.container}>
-                <AppRouter/>
-            </View>
+            <Provider store={store}>
+                <View style={styles.container}>
+                    <AppRouter/>
+                </View>
+            </Provider>
         );
     }
 }

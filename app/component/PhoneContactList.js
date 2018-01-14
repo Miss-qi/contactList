@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { FlatList, Text, View, StyleSheet, TouchableOpacity, NativeModules } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import Avatar from "./avatar/Avatar";
+import { connect } from 'react-redux';
+import { fetchPhoneContactList } from '../actions/fetchPhoneContactList';
+import { dispatch } from "redux";
 
 const phoneContact = NativeModules.PhoneContact;
 
@@ -18,7 +21,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ccc',
     }
 });
-export default class PhoneContactList extends Component {
+class PhoneContactList extends Component {
     constructor(props) {
         super(props);
         this.keyExtractor = this.keyExtractor.bind(this);
@@ -28,7 +31,7 @@ export default class PhoneContactList extends Component {
     }
 
     componentDidMount() {
-        phoneContact.show().then(data => this.setState({data}));
+        phoneContact.show().then(data => this.props.fetchPhoneContactList(data));
     }
 
     keyExtractor(item, index) {
@@ -53,7 +56,7 @@ export default class PhoneContactList extends Component {
     render() {
         return (
             <FlatList
-                data={this.state.data}
+                data={this.props.data || []}
                 keyExtractor={this._keyExtractor}
                 renderItem={this._renderItem}
                 ItemSeparatorComponent={this._renderSeparator}
@@ -61,3 +64,18 @@ export default class PhoneContactList extends Component {
         )
     }
 }
+
+
+const mapStateToProps = (state) => ({
+    data: state.phoneContactList
+});
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchPhoneContactList: (contactList) => {
+            dispatch(fetchPhoneContactList(contactList));
+        }
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhoneContactList);
